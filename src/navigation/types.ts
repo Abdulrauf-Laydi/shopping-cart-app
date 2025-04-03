@@ -4,6 +4,7 @@ export type RootStackParamList = {
   ShoppingCart: undefined;
   Login: undefined;
   Signup: undefined;
-  Checkout: undefined; // Added Checkout screen
+  Checkout: undefined;
+  ProductDetails: { productId: string }; // Added Product Details screen with param
   // Add other screen definitions here as the app grows
 };

@@ -7,7 +7,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Beko Refrigerator',
     price: 15000,
     description: 'A high-quality, energy-efficient refrigerator.',
-    imageUrl: 'https://via.placeholder.com/150/FF0000/FFFFFF?text=Beko+Fridge', // Placeholder image
+    imageUrl: 'https://www.beko.com.tr/media/resize/7285520234_LO1_20210218_103817.png/2000Wx2000H/image.webp', // Changed URL
     brand: 'Beko',
     countryOfOrigin: 'Turkey',
   },
@@ -16,7 +16,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Vestel Smart TV',
     price: 9500,
     description: '55-inch 4K Smart TV with vibrant colors.',
-    imageUrl: 'https://via.placeholder.com/150/00FF00/FFFFFF?text=Vestel+TV', // Placeholder image
+    imageUrl: 'https://statics.vestel.com.tr/productimages/20278808_r1_1000_1000.jpg', // Changed URL
     brand: 'Vestel',
     countryOfOrigin: 'Turkey',
   },
@@ -25,7 +25,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Arcelik Washing Machine',
     price: 12000,
     description: 'Front-load washing machine with multiple programs.',
-    imageUrl: 'https://via.placeholder.com/150/0000FF/FFFFFF?text=Arcelik+Washer', // Placeholder image
+    imageUrl: 'https://productimages.hepsiburada.net/s/129/424-600/110000080281865.jpg/format:webp', // Changed URL
     brand: 'Arcelik',
     countryOfOrigin: 'Turkey',
   },
@@ -34,7 +34,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Sony Headphones',
     price: 2500,
     description: 'Noise-cancelling over-ear headphones.',
-    imageUrl: 'https://via.placeholder.com/150/FFFF00/000000?text=Sony+HP', // Placeholder image
+    imageUrl: 'https://m.media-amazon.com/images/I/51aXvjzcukL.__AC_SX300_SY300_QL70_FMwebp_.jpg', // Changed URL
     brand: 'Sony',
     countryOfOrigin: 'Other',
   },
@@ -43,7 +43,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Samsung Galaxy Phone',
     price: 25000,
     description: 'Latest flagship smartphone from Samsung.',
-    imageUrl: 'https://via.placeholder.com/150/00FFFF/000000?text=Samsung+Phone', // Placeholder image
+    imageUrl: 'https://cdn.vatanbilgisayar.com/Upload/PRODUCT/samsung/thumb/144576-1-1_large.jpg', // Changed URL
     brand: 'Samsung',
     countryOfOrigin: 'Other',
   },
@@ -52,7 +52,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: 'Apple MacBook Pro',
     price: 45000,
     description: 'Powerful laptop for professionals.',
-    imageUrl: 'https://via.placeholder.com/150/FF00FF/FFFFFF?text=MacBook+Pro', // Placeholder image
+    imageUrl: 'https://cdn.vatanbilgisayar.com/Upload/PRODUCT/apple/thumb/1-416_large.jpg', // Changed URL
     brand: 'Apple',
     countryOfOrigin: 'Other',
   },

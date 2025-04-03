@@ -1,5 +1,6 @@
+// src/screens/ProductListScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert } from 'react-native'; // Import Alert
+import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert, Platform } from 'react-native'; // Added Platform and Alert
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -8,6 +9,24 @@ import ProductItem from '../components/ProductItem';
 import { Product } from '../types/Product';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+
+// --- Helper function for cross-platform alerts ---
+// (Consider moving to a shared utils file later)
+const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
+  if (Platform.OS === 'web') {
+    alert(`${title}\n${message}`);
+    if (buttons) {
+      if (buttons.length > 0) {
+        if (buttons[0].onPress) {
+          buttons[0].onPress();
+        }
+      }
+    }
+  } else {
+    Alert.alert(title, message, buttons);
+  }
+};
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
 
@@ -41,7 +60,8 @@ function ProductListScreen({ navigation }: Props) {
   const renderProductItem = ({ item }: { item: Product }) => (
     <ProductItem
       product={item}
-      onPress={() => console.log('Pressed product:', item.name)}
+      // Corrected: Navigate to ProductDetails on press, passing productId
+      onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
       onAddToCart={addToCart}
     />
   );
@@ -63,7 +83,8 @@ function ProductListScreen({ navigation }: Props) {
       // Navigation happens automatically via AuthContext listener
     } catch (error) {
       console.error("Logout failed:", error);
-      Alert.alert('Logout Failed', 'Could not log out. Please try again.');
+      // Use showAlert for cross-platform compatibility
+      showAlert('Logout Failed', 'Could not log out. Please try again.');
     }
   };
 
@@ -106,7 +127,7 @@ function ProductListScreen({ navigation }: Props) {
   );
 }
 
-// Updated Styles
+// Styles remain the same...
 const styles = StyleSheet.create({
     container: {
       flex: 1,
