@@ -1,9 +1,28 @@
 // src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+// Import Platform
+import { View, Text, TextInput, Button, StyleSheet, Alert, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+
+// --- Helper function for cross-platform alerts ---
+// (Copied from CheckoutScreen - consider moving to a shared utils file later)
+const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
+  if (Platform.OS === 'web') {
+    alert(`${title}\n${message}`);
+    // Refactored condition to avoid &&
+    if (buttons) {
+      if (buttons.length > 0) {
+        if (buttons[0].onPress) {
+          buttons[0].onPress(); // Manually trigger first button's action on web
+        }
+      }
+    }
+  } else {
+    Alert.alert(title, message, buttons);
+  }
+};
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -15,7 +34,8 @@ function LoginScreen({ navigation }: LoginScreenProps) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password.');
+      // Use showAlert
+      showAlert('Error', 'Please enter both email and password.');
       return;
     }
     setLoading(true);
@@ -23,14 +43,16 @@ function LoginScreen({ navigation }: LoginScreenProps) {
       await login(email, password); // Call the login function from context
       // Navigation happens automatically via AuthContext listener in App.tsx
     } catch (error: any) {
+      // Use showAlert
       // Improve error handling based on Firebase error codes if needed
-      Alert.alert('Login Failed', error.message || 'An unknown error occurred.');
+      showAlert('Login Failed', error.message || 'An unknown error occurred.');
     } finally {
       // Ensure loading is set to false even if login fails
       setLoading(false);
     }
   };
 
+  // Rest of the component remains the same...
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>

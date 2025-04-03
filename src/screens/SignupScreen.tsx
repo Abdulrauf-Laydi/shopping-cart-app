@@ -1,9 +1,28 @@
 // src/screens/SignupScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+// Import Platform
+import { View, Text, TextInput, Button, StyleSheet, Alert, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+
+// --- Helper function for cross-platform alerts ---
+// (Copied - consider moving to a shared utils file later)
+const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
+  if (Platform.OS === 'web') {
+    alert(`${title}\n${message}`);
+    // Refactored condition to avoid &&
+    if (buttons) {
+      if (buttons.length > 0) {
+        if (buttons[0].onPress) {
+          buttons[0].onPress(); // Manually trigger first button's action on web
+        }
+      }
+    }
+  } else {
+    Alert.alert(title, message, buttons);
+  }
+};
 
 type SignupScreenProps = NativeStackScreenProps<RootStackParamList, 'Signup'>;
 
@@ -15,17 +34,18 @@ function SignupScreen({ navigation }: SignupScreenProps) {
   const { signup } = useAuth(); // Get signup function from context
 
   const handleSignup = async () => {
+    // Use showAlert for validation messages
     if (!email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields.');
+      showAlert('Error', 'Please fill in all fields.');
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match.');
+      showAlert('Error', 'Passwords do not match.');
       return;
     }
     // Basic password validation (e.g., minimum length)
     if (password.length < 6) {
-       Alert.alert('Error', 'Password should be at least 6 characters long.');
+       showAlert('Error', 'Password should be at least 6 characters long.');
        return;
     }
 
@@ -34,14 +54,16 @@ function SignupScreen({ navigation }: SignupScreenProps) {
       await signup(email, password); // Call the signup function from context
       // Navigation happens automatically via AuthContext listener in App.tsx
     } catch (error: any) {
+      // Use showAlert for error message
       // Improve error handling based on Firebase error codes if needed
       // e.g., check for 'auth/email-already-in-use'
-      Alert.alert('Signup Failed', error.message || 'An unknown error occurred.');
+      showAlert('Signup Failed', error.message || 'An unknown error occurred.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Rest of the component remains the same...
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>

@@ -5,6 +5,7 @@ import ProductListScreen from './src/screens/ProductListScreen';
 import ShoppingCartScreen from './src/screens/ShoppingCartScreen';
 import LoginScreen from './src/screens/LoginScreen'; // Import LoginScreen
 import SignupScreen from './src/screens/SignupScreen'; // Import SignupScreen
+import CheckoutScreen from './src/screens/CheckoutScreen'; // Import CheckoutScreen
 import { RootStackParamList } from './src/navigation/types';
 import { CartProvider } from './src/context/CartContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext'; // Import AuthProvider and useAuth
@@ -26,7 +27,12 @@ function AppStack() {
         component={ShoppingCartScreen}
         options={{ title: 'Shopping Cart' }}
       />
-      {/* Add other main app screens here */}
+      {/* Added Checkout Screen */}
+      <Stack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+        options={{ title: 'Checkout' }}
+      />
     </Stack.Navigator>
   );
 }

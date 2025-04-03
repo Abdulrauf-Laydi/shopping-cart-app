@@ -1,20 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Button } from 'react-native'; // Added FlatList, Button
+import { View, Text, StyleSheet, FlatList, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { useCart } from '../context/CartContext'; // Import useCart hook
-import CartListItem from '../components/CartListItem'; // Import CartListItem
-import { CartItem } from '../types/CartItem'; // Import CartItem type
+import { useCart } from '../context/CartContext';
+import CartListItem from '../components/CartListItem';
+import { CartItem } from '../types/CartItem';
 
-// Define props type
 type Props = NativeStackScreenProps<RootStackParamList, 'ShoppingCart'>;
 
 function ShoppingCartScreen({ navigation }: Props) {
-  // Get cart data and functions from context
   const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, getCartTotal } = useCart();
 
-  // Function to render each cart item
   const renderCartItem = ({ item }: { item: CartItem }) => (
     <CartListItem
       item={item}
@@ -38,7 +35,8 @@ function ShoppingCartScreen({ navigation }: Props) {
           />
           <View style={styles.footer}>
             <Text style={styles.totalText}>Total: ₺{getCartTotal().toFixed(2)}</Text>
-            <Button title="Checkout" onPress={() => { /* Implement checkout later */ console.log('Proceed to checkout'); }} />
+            {/* Corrected: Navigate to Checkout screen */}
+            <Button title="Checkout" onPress={() => navigation.navigate('Checkout')} />
           </View>
         </>
       )}
@@ -50,7 +48,7 @@ function ShoppingCartScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8', // Match ProductList background
+    backgroundColor: '#f8f8f8',
   },
   listContentContainer: {
     padding: 10,
@@ -58,7 +56,7 @@ const styles = StyleSheet.create({
   emptyCartText: {
     flex: 1,
     textAlign: 'center',
-    textAlignVertical: 'center', // Center text vertically
+    textAlignVertical: 'center',
     fontSize: 18,
     color: '#666',
   },

@@ -12,10 +12,10 @@ interface CartContextType {
   removeFromCart: (productId: string) => void;
   getCartTotal: () => number;
   getCartItemCount: () => number;
+  clearCart: () => void; // Added clearCart type
 }
 
-// Create the context with a default value (can be undefined or a default object)
-// Using 'null' initially and checking in the hook is common practice
+// Create the context with a default value
 const CartContext = createContext<CartContextType | null>(null);
 
 // Create a custom hook for easy context consumption
@@ -42,12 +42,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
-        // Increase quantity if item already exists
         return prevItems.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       } else {
-        // Add new item with quantity 1
         return [...prevItems, { ...product, quantity: 1 }];
       }
     });
@@ -65,10 +63,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === productId);
       if (existingItem?.quantity === 1) {
-        // Remove item if quantity becomes 0
         return prevItems.filter(item => item.id !== productId);
       } else {
-        // Decrease quantity
         return prevItems.map(item =>
           item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
         );
@@ -88,6 +84,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       return cartItems.reduce((count, item) => count + item.quantity, 0);
   };
 
+  // Added clearCart function
+  const clearCart = () => {
+      setCartItems([]);
+  };
+
   // --- Provide Context Value ---
   const value = {
     cartItems,
@@ -97,6 +98,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     removeFromCart,
     getCartTotal,
     getCartItemCount,
+    clearCart, // Added clearCart to value
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
