@@ -1,6 +1,5 @@
 // src/screens/CheckoutScreen.tsx
 import React, { useState } from 'react';
-// Import Platform
 import { View, Text, StyleSheet, Button, ScrollView, Alert, TextInput, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -11,18 +10,15 @@ type CheckoutScreenProps = NativeStackScreenProps<RootStackParamList, 'Checkout'
 // --- Helper function for cross-platform alerts ---
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
   if (Platform.OS === 'web') {
-    // Simple browser alert for web (doesn't support titles or buttons well)
     alert(`${title}\n${message}`);
-    // Refactored condition to avoid &&
     if (buttons) {
       if (buttons.length > 0) {
         if (buttons[0].onPress) {
-          buttons[0].onPress(); // Manually trigger first button's action on web
+          buttons[0].onPress();
         }
       }
     }
   } else {
-    // Use React Native Alert for native platforms
     Alert.alert(title, message, buttons);
   }
 };
@@ -48,7 +44,6 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
   const isValidCvv = (value: string) => /^\d{3,4}$/.test(value.trim());
 
   const handlePlaceOrder = () => {
-    // --- Use showAlert helper for validation ---
     if (!isValidName(name)) { showAlert('Invalid Input', 'Please enter a valid name.'); return; }
     if (!isValidAddress(address)) { showAlert('Invalid Input', 'Please enter a valid address.'); return; }
     if (!isValidCity(city)) { showAlert('Invalid Input', 'Please enter a valid city.'); return; }
@@ -57,9 +52,20 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
     if (!isValidExpiryDate(expiryDate)) { showAlert('Invalid Input', 'Please enter a valid expiry date in MM/YY format.'); return; }
     if (!isValidCvv(cvv)) { showAlert('Invalid Input', 'Please enter a valid 3 or 4 digit CVV.'); return; }
 
-    console.log('Placing order with validated details:', { /* ... details ... */ });
+    // --- Corrected console.log ---
+    console.log('Placing order with validated details:', {
+        name: name.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        postalCode: postalCode.trim(),
+        cardNumber: cardNumber.replace(/\s/g, ''), // Log cleaned card number
+        expiryDate: expiryDate.trim(),
+        cvv: cvv.trim(),
+        total: getCartTotal(),
+        // Ensure correct arrow function syntax here
+        items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity }))
+    });
 
-    // --- Use showAlert helper for success message ---
     showAlert(
         'Order Placed (Simulated)',
         'Your order has been successfully placed.',
@@ -71,7 +77,6 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
     );
   };
 
-  // Rest of the component remains the same...
   if (cartItems.length === 0) {
       if (navigation.canGoBack()) {
           navigation.goBack();
@@ -122,7 +127,6 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
       </View>
 
       <Button title="Place Order (Simulated)" onPress={handlePlaceOrder} />
-      {/* Correctly formatted comment */}
       <View style={{ height: 50 }} />{/* Add some padding at the bottom */}
 
     </ScrollView>
@@ -131,64 +135,16 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
 
 // Styles remain the same...
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 15,
-    backgroundColor: '#f8f8f8',
-  },
-   centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  summaryItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-   summaryItemText: {
-    fontSize: 14,
-  },
-  summaryTotal: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
-  totalText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  input: {
-    height: 45,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, padding: 15, backgroundColor: '#f8f8f8' },
+   centerContent: { justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  section: { marginBottom: 20, padding: 15, backgroundColor: '#fff', borderRadius: 8 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  summaryItem: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#eee' },
+   summaryItemText: { fontSize: 14 },
+  summaryTotal: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#ccc' },
+  totalText: { fontSize: 16, fontWeight: 'bold' },
+  input: { height: 45, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingHorizontal: 10, marginBottom: 10, backgroundColor: '#fff' },
 });
 
 export default CheckoutScreen;

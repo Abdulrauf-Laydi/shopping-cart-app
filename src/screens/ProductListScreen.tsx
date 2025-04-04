@@ -1,6 +1,7 @@
 // src/screens/ProductListScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert, Platform } from 'react-native'; // Added Platform and Alert
+// Import Pressable for better sort button styling
+import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert, Platform, TouchableOpacity, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -27,6 +28,12 @@ const showAlert = (title: string, message: string, buttons?: Array<{ text: strin
   }
 };
 
+// Define possible filter values (including 'All')
+type CountryFilter = 'All' | Product['countryOfOrigin'];
+const filterCountries: CountryFilter[] = ['All', 'Turkey', 'USA', 'Germany', 'Other'];
+
+// Define possible sort options
+type SortOption = 'default' | 'price-asc' | 'price-desc';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
 
@@ -36,26 +43,50 @@ function ProductListScreen({ navigation }: Props) {
   const cartItemCount = getCartItemCount();
 
   const [searchQuery, setSearchQuery] = useState('');
+  // Add state for selected country filter
+  const [selectedCountry, setSelectedCountry] = useState<CountryFilter>('All');
+  // Add state for selected sort option
+  const [selectedSort, setSelectedSort] = useState<SortOption>('default');
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Filter and sort logic remains the same...
-    const filtered = MOCK_PRODUCTS.filter(product =>
+    // --- Apply search filter ---
+    let filtered = MOCK_PRODUCTS.filter(product =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    const sorted = filtered.sort((a, b) => {
-      const isATurkish = a.countryOfOrigin === 'Turkey';
-      const isBTurkish = b.countryOfOrigin === 'Turkey';
-      if (isATurkish) {
-        if (!isBTurkish) return -1;
-      } else {
-        if (isBTurkish) return 1;
+
+    // --- Apply country filter (if not 'All') ---
+    if (selectedCountry !== 'All') {
+        filtered = filtered.filter(product => product.countryOfOrigin === selectedCountry);
+    }
+
+    // --- Apply sorting ---
+    let sorted = [...filtered]; // Create a copy to sort
+
+    // 1. Default sort (Country priority if 'All' selected, then name)
+    sorted.sort((a, b) => {
+      if (selectedCountry === 'All') {
+          const isATurkish = a.countryOfOrigin === 'Turkey';
+          const isBTurkish = b.countryOfOrigin === 'Turkey';
+          if (isATurkish) {
+              if (!isBTurkish) return -1; // a comes first
+          } else {
+              if (isBTurkish) return 1; // b comes first
+          }
       }
-      return a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name); // Default sort by name
     });
+
+    // 2. Apply price sort if selected
+    if (selectedSort === 'price-asc') {
+        sorted.sort((a, b) => a.price - b.price); // Low to High
+    } else if (selectedSort === 'price-desc') {
+        sorted.sort((a, b) => b.price - a.price); // High to Low
+    }
+
     setDisplayedProducts(sorted);
-  }, [searchQuery]);
+  }, [searchQuery, selectedCountry, selectedSort]); // Add selectedSort to dependencies
 
   const renderProductItem = ({ item }: { item: Product }) => (
     <ProductItem
@@ -88,6 +119,25 @@ function ProductListScreen({ navigation }: Props) {
     }
   };
 
+  // Function to cycle through sort options
+  const cycleSortOption = () => {
+      if (selectedSort === 'default') {
+          setSelectedSort('price-asc');
+      } else if (selectedSort === 'price-asc') {
+          setSelectedSort('price-desc');
+      } else {
+          setSelectedSort('default');
+      }
+  };
+
+  // Get text for the sort button
+  const getSortButtonText = () => {
+      if (selectedSort === 'price-asc') return 'Sort: Price Low-High';
+      if (selectedSort === 'price-desc') return 'Sort: Price High-Low';
+      return 'Sort: Default';
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Header with Cart and Logout */}
@@ -114,6 +164,39 @@ function ProductListScreen({ navigation }: Props) {
         />
       </View>
 
+      {/* Filter & Sort Controls */}
+      <View style={styles.controlsContainer}>
+          {/* Filter Buttons */}
+          <View style={styles.filterContainer}>
+            {filterCountries.map((country) => (
+              <TouchableOpacity
+                key={country}
+                // Refactored conditional style using ternary
+                style={[
+                  styles.filterButton,
+                  selectedCountry === country ? styles.filterButtonSelected : null
+                ]}
+                onPress={() => setSelectedCountry(country)}
+              >
+                <Text
+                  // Refactored conditional style using ternary
+                  style={[
+                    styles.filterButtonText,
+                    selectedCountry === country ? styles.filterButtonTextSelected : null
+                  ]}
+                >
+                  {country}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {/* Sort Button */}
+          <Pressable style={styles.sortButton} onPress={cycleSortOption}>
+              <Text style={styles.sortButtonText}>{getSortButtonText()}</Text>
+          </Pressable>
+      </View>
+
+
       {/* Product List */}
       <FlatList
         data={displayedProducts}
@@ -127,70 +210,69 @@ function ProductListScreen({ navigation }: Props) {
   );
 }
 
-// Styles remain the same...
+// --- Updated Styles ---
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#f8f8f8',
-    },
+    // ... other styles ...
+    container: { flex: 1, backgroundColor: '#f8f8f8' },
     header: {
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-      backgroundColor: '#fff',
-      borderBottomWidth: 1,
-      borderBottomColor: '#eee',
-      // Changed alignment for multiple buttons
-      flexDirection: 'row',
-      justifyContent: 'flex-end', // Align button group to the right
-      alignItems: 'center',
+      paddingVertical: 10, paddingHorizontal: 15, backgroundColor: '#fff',
+      borderBottomWidth: 1, borderBottomColor: '#eee', flexDirection: 'row',
+      justifyContent: 'flex-end', alignItems: 'center',
     },
-    headerButtons: { // Container for all header buttons
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    cartButtonContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginLeft: 15, // Add space between Logout and Cart buttons
-    },
+    headerButtons: { flexDirection: 'row', alignItems: 'center' },
+    cartButtonContainer: { flexDirection: 'row', alignItems: 'center', marginLeft: 15 },
     badgeContainer: {
-      backgroundColor: 'red',
-      borderRadius: 10,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      marginLeft: -10,
-      marginTop: -10,
-      zIndex: 1,
+      backgroundColor: 'red', borderRadius: 10, paddingHorizontal: 6,
+      paddingVertical: 2, marginLeft: -10, marginTop: -10, zIndex: 1,
     },
-    badgeText: {
-      color: 'white',
-      fontSize: 10,
-      fontWeight: 'bold',
-    },
-    searchContainer: {
-      padding: 10,
-      backgroundColor: '#fff',
-      borderBottomWidth: 1,
-      borderBottomColor: '#eee',
-    },
+    badgeText: { color: 'white', fontSize: 10, fontWeight: 'bold' },
+    searchContainer: { padding: 10, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
     searchInput: {
-      height: 40,
-      borderColor: '#ddd',
-      borderWidth: 1,
-      borderRadius: 8,
-      paddingHorizontal: 10,
-      backgroundColor: '#fff',
+      height: 40, borderColor: '#ddd', borderWidth: 1, borderRadius: 8,
+      paddingHorizontal: 10, backgroundColor: '#fff',
     },
-    listContentContainer: {
-      paddingHorizontal: 10,
-      paddingBottom: 10,
+    controlsContainer: { // Container for filters and sort
+        backgroundColor: '#f0f0f0',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
     },
-    emptyListText: {
-        padding: 20,
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#666',
-    }
-  });
+    filterContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around', // Distribute buttons evenly
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+    },
+    filterButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+    filterButtonSelected: {
+        backgroundColor: '#007bff', // Example selected color
+        borderColor: '#007bff',
+    },
+    filterButtonText: {
+        color: '#333',
+    },
+    filterButtonTextSelected: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+    sortButton: { // Style for the sort button
+        paddingVertical: 10,
+        alignItems: 'center',
+        backgroundColor: '#e7e7e7', // Slightly different background
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+    },
+    sortButtonText: {
+        color: '#007bff',
+        fontWeight: 'bold',
+    },
+    listContentContainer: { paddingHorizontal: 10, paddingBottom: 10 },
+    emptyListText: { padding: 20, textAlign: 'center', fontSize: 16, color: '#666' }
+});
 
 export default ProductListScreen;

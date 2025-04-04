@@ -4,7 +4,7 @@ export interface Product {
   name: string;
   price: number;
   description: string;
-  imageUrl: string; // URL to the product image
-  brand: string; // To help with the bonus requirement
-  countryOfOrigin: 'Turkey' | 'Other'; // To help with sorting/filtering
+  imageUrl: string;
+  brand: string;
+  countryOfOrigin: 'Turkey' | 'USA' | 'Germany' | 'Other'; // Added USA, Germany
 }

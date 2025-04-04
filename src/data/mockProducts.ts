@@ -36,7 +36,7 @@ export const MOCK_PRODUCTS: Product[] = [
     description: 'Noise-cancelling over-ear headphones.',
     imageUrl: 'https://m.media-amazon.com/images/I/51aXvjzcukL.__AC_SX300_SY300_QL70_FMwebp_.jpg', // Changed URL
     brand: 'Sony',
-    countryOfOrigin: 'Other',
+    countryOfOrigin: 'Germany', // Changed from Other
   },
   {
     id: '5',
@@ -45,7 +45,7 @@ export const MOCK_PRODUCTS: Product[] = [
     description: 'Latest flagship smartphone from Samsung.',
     imageUrl: 'https://cdn.vatanbilgisayar.com/Upload/PRODUCT/samsung/thumb/144576-1-1_large.jpg', // Changed URL
     brand: 'Samsung',
-    countryOfOrigin: 'Other',
+    countryOfOrigin: 'Other', // Keeping as Other
   },
    {
     id: '6',
@@ -54,6 +54,6 @@ export const MOCK_PRODUCTS: Product[] = [
     description: 'Powerful laptop for professionals.',
     imageUrl: 'https://cdn.vatanbilgisayar.com/Upload/PRODUCT/apple/thumb/1-416_large.jpg', // Changed URL
     brand: 'Apple',
-    countryOfOrigin: 'Other',
+    countryOfOrigin: 'USA', // Changed from Other
   },
 ];
