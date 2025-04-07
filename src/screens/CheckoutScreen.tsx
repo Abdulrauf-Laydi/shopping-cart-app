@@ -4,11 +4,17 @@ import { View, Text, StyleSheet, Button, ScrollView, Alert, TextInput, Platform 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useCart } from '../context/CartContext';
+// Import validation functions
+import {
+  isValidName, isValidAddress, isValidCity, isValidPostalCode,
+  isValidCardNumber, isValidExpiryDate, isValidCvv
+} from '../utils/validation';
 
 type CheckoutScreenProps = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
 
 // --- Helper function for cross-platform alerts ---
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
+  // ... (showAlert function remains the same) ...
   if (Platform.OS === 'web') {
     alert(`${title}\n${message}`);
     if (buttons) {
@@ -35,15 +41,10 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
 
-  const isValidName = (value: string) => value.trim().length > 0;
-  const isValidAddress = (value: string) => value.trim().length > 0;
-  const isValidCity = (value: string) => value.trim().length > 0;
-  const isValidPostalCode = (value: string) => /^\d+$/.test(value.trim());
-  const isValidCardNumber = (value: string) => /^\d{16}$/.test(value.replace(/\s/g, ''));
-  const isValidExpiryDate = (value: string) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(value.trim());
-  const isValidCvv = (value: string) => /^\d{3,4}$/.test(value.trim());
+  // --- Removed local validation function definitions ---
 
   const handlePlaceOrder = () => {
+    // Validation logic now uses imported functions
     if (!isValidName(name)) { showAlert('Invalid Input', 'Please enter a valid name.'); return; }
     if (!isValidAddress(address)) { showAlert('Invalid Input', 'Please enter a valid address.'); return; }
     if (!isValidCity(city)) { showAlert('Invalid Input', 'Please enter a valid city.'); return; }
@@ -58,7 +59,7 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
         address: address.trim(),
         city: city.trim(),
         postalCode: postalCode.trim(),
-        cardNumber: cardNumber.replace(/\s/g, ''), // Log cleaned card number
+        cardNumber: cardNumber.replace(/\s/g, ''),
         expiryDate: expiryDate.trim(),
         cvv: cvv.trim(),
         total: getCartTotal(),
@@ -77,6 +78,7 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
     );
   };
 
+  // Rest of the component remains the same...
   if (cartItems.length === 0) {
       if (navigation.canGoBack()) {
           navigation.goBack();
@@ -92,7 +94,8 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
 
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-      <Text style={styles.title}>Checkout</Text>
+      {/* ... JSX remains the same ... */}
+       <Text style={styles.title}>Checkout</Text>
 
       {/* Order Summary Section */}
       <View style={styles.section}>
@@ -128,7 +131,6 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
 
       <Button title="Place Order (Simulated)" onPress={handlePlaceOrder} />
       <View style={{ height: 50 }} />{/* Add some padding at the bottom */}
-
     </ScrollView>
   );
 }

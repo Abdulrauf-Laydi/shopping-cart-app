@@ -33,7 +33,8 @@ const CartListItem: React.FC<CartListItemProps> = ({ item, onIncrease, onDecreas
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      {/* Added testID */}
+      <Image testID={`cartItemImage-${item.id}`} source={{ uri: item.imageUrl }} style={styles.image} />
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.price}>₺{item.price.toFixed(2)}</Text>
