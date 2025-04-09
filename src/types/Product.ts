@@ -6,5 +6,5 @@ export interface Product {
   description: string;
   imageUrl: string;
   brand: string;
-  countryOfOrigin: 'Turkey' | 'USA' | 'Germany' | 'Other'; // Added USA, Germany
+  countryOfOrigin: 'Turkey' | 'USA' | 'Germany' | 'Other';
 }

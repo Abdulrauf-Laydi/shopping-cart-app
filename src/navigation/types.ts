@@ -5,6 +5,6 @@ export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   Checkout: undefined;
-  ProductDetails: { productId: string }; // Added Product Details screen with param
-  // Add other screen definitions here as the app grows
+  ProductDetails: { productId: string }; 
+  
 };

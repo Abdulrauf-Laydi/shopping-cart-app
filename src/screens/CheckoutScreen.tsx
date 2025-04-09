@@ -14,7 +14,7 @@ type CheckoutScreenProps = NativeStackScreenProps<RootStackParamList, 'Checkout'
 
 // --- Helper function for cross-platform alerts ---
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
-  // ... (showAlert function remains the same) ...
+  
   if (Platform.OS === 'web') {
     alert(`${title}\n${message}`);
     if (buttons) {
@@ -41,7 +41,7 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
 
-  // --- Removed local validation function definitions ---
+  
 
   const handlePlaceOrder = () => {
     // Validation logic now uses imported functions
@@ -78,7 +78,7 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
     );
   };
 
-  // Rest of the component remains the same...
+  
   if (cartItems.length === 0) {
       if (navigation.canGoBack()) {
           navigation.goBack();
@@ -135,7 +135,7 @@ function CheckoutScreen({ navigation }: CheckoutScreenProps) {
   );
 }
 
-// Styles remain the same...
+
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, backgroundColor: '#f8f8f8' },
    centerContent: { justifyContent: 'center', alignItems: 'center' },

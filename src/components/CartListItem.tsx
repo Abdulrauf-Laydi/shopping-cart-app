@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   quantityText: {
     marginHorizontal: 8,
     fontSize: 16,
-    minWidth: 20, // Ensure space for quantity
+    minWidth: 20, 
     textAlign: 'center',
   },
 });

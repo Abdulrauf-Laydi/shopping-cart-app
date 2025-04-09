@@ -12,7 +12,7 @@ interface CartContextType {
   removeFromCart: (productId: string) => void;
   getCartTotal: () => number;
   getCartItemCount: () => number;
-  clearCart: () => void; // Added clearCart type
+  clearCart: () => void; 
 }
 
 // Create the context with a default value
@@ -98,7 +98,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     removeFromCart,
     getCartTotal,
     getCartItemCount,
-    clearCart, // Added clearCart to value
+    clearCart, 
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -1,8 +1,8 @@
 // src/components/__tests__/ProductItem.test.tsx
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import ProductItem from '../ProductItem'; // Adjust path if necessary
-import { Product } from '../../types/Product'; // Adjust path if necessary
+import ProductItem from '../ProductItem'; 
+import { Product } from '../../types/Product'; 
 
 // Mock product data for testing
 const mockProduct: Product = {
@@ -33,7 +33,7 @@ describe('<ProductItem />', () => {
   });
 
   it('calls onPress when the details area is pressed', () => {
-    const mockOnPress = jest.fn(); // Create a Jest mock function
+    const mockOnPress = jest.fn(); // Jest mock function
     render(<ProductItem product={mockProduct} onPress={mockOnPress} />);
 
     // Use getByTestId to find the touchable area
@@ -43,7 +43,7 @@ describe('<ProductItem />', () => {
   });
 
   it('calls onAddToCart when the "Add to Cart" button is pressed', () => {
-    const mockOnAddToCart = jest.fn(); // Create a Jest mock function
+    const mockOnAddToCart = jest.fn(); // Jest mock function
     render(<ProductItem product={mockProduct} onAddToCart={mockOnAddToCart} />);
 
     // Find the button by its title

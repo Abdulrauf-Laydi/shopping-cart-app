@@ -1,17 +1,15 @@
 // src/screens/SignupScreen.tsx
 import React, { useState } from 'react';
-// Import Platform
 import { View, Text, TextInput, Button, StyleSheet, Alert, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 // --- Helper function for cross-platform alerts ---
-// (Copied - consider moving to a shared utils file later)
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
   if (Platform.OS === 'web') {
     alert(`${title}\n${message}`);
-    // Refactored condition to avoid &&
+    
     if (buttons) {
       if (buttons.length > 0) {
         if (buttons[0].onPress) {
@@ -63,7 +61,7 @@ function SignupScreen({ navigation }: SignupScreenProps) {
     }
   };
 
-  // Rest of the component remains the same...
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
@@ -100,7 +98,7 @@ function SignupScreen({ navigation }: SignupScreenProps) {
   );
 }
 
-// Styles remain the same...
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

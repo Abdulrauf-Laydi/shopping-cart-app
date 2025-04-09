@@ -1,8 +1,8 @@
 // src/components/__tests__/CartListItem.test.tsx
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import CartListItem from '../CartListItem'; // Adjust path if necessary
-import { CartItem } from '../../types/CartItem'; // Adjust path if necessary
+import CartListItem from '../CartListItem'; 
+import { CartItem } from '../../types/CartItem'; 
 
 // Mock cart item data
 const mockCartItem: CartItem = {
@@ -63,7 +63,7 @@ describe('<CartListItem />', () => {
     render(<CartListItem item={mockCartItemQty1} onDecrease={mockOnDecrease} />); // Using item with qty 1
 
     const decreaseButton = screen.getByRole('button', { name: '-' });
-    fireEvent.press(decreaseButton); // Attempt to press
+    fireEvent.press(decreaseButton); 
 
     expect(mockOnDecrease).not.toHaveBeenCalled();
   });

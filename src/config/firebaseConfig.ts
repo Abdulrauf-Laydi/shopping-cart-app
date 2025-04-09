@@ -21,8 +21,7 @@ if (!getApps().length) {
   app = getApp(); // If already initialized, use that instance
 }
 
-// We are removing the explicit initializeAuth persistence setup for now
-// to resolve the type error. Default persistence might apply.
+
 
 // Export app and getAuth function
 export { app, getAuth };

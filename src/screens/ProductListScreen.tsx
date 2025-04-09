@@ -1,6 +1,5 @@
 // src/screens/ProductListScreen.tsx
 import React, { useState, useEffect } from 'react';
-// Import Pressable for better sort button styling
 import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert, Platform, TouchableOpacity, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -12,7 +11,6 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 // --- Helper function for cross-platform alerts ---
-// (Consider moving to a shared utils file later)
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
   if (Platform.OS === 'web') {
     alert(`${title}\n${message}`);
@@ -62,7 +60,7 @@ function ProductListScreen({ navigation }: Props) {
     }
 
     // --- Apply sorting ---
-    let sorted = [...filtered]; // Create a copy to sort
+    let sorted = [...filtered]; 
 
     // 1. Default sort (Country priority if 'All' selected, then name)
     sorted.sort((a, b) => {
@@ -91,7 +89,7 @@ function ProductListScreen({ navigation }: Props) {
   const renderProductItem = ({ item }: { item: Product }) => (
     <ProductItem
       product={item}
-      // Corrected: Navigate to ProductDetails on press, passing productId
+      
       onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
       onAddToCart={addToCart}
     />
@@ -210,9 +208,9 @@ function ProductListScreen({ navigation }: Props) {
   );
 }
 
-// --- Updated Styles ---
+
 const styles = StyleSheet.create({
-    // ... other styles ...
+    
     container: { flex: 1, backgroundColor: '#f8f8f8' },
     header: {
       paddingVertical: 10, paddingHorizontal: 15, backgroundColor: '#fff',

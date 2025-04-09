@@ -7,7 +7,6 @@ import { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 // --- Helper function for cross-platform alerts ---
-// (Copied from CheckoutScreen - consider moving to a shared utils file later)
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
   if (Platform.OS === 'web') {
     alert(`${title}\n${message}`);
@@ -52,7 +51,7 @@ function LoginScreen({ navigation }: LoginScreenProps) {
     }
   };
 
-  // Rest of the component remains the same...
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -82,7 +81,7 @@ function LoginScreen({ navigation }: LoginScreenProps) {
   );
 }
 
-// Styles remain the same...
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
