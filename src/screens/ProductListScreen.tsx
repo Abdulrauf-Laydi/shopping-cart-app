@@ -1,14 +1,16 @@
 // src/screens/ProductListScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert, Platform, TouchableOpacity, Pressable } from 'react-native';
+import { View, StyleSheet, FlatList, Button, Text, TextInput, Alert, Platform, TouchableOpacity, Pressable, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { MOCK_PRODUCTS } from '../data/mockProducts';
+// import { MOCK_PRODUCTS } from '../data/mockProducts'; 
 import ProductItem from '../components/ProductItem';
 import { Product } from '../types/Product';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+import { db } from '../config/firebaseConfig'; // Import db instance
+import { ref, onValue, off } from 'firebase/database'; // Import RTDB functions
 
 // --- Helper function for cross-platform alerts ---
 const showAlert = (title: string, message: string, buttons?: Array<{ text: string, onPress?: () => void }>) => {
@@ -45,25 +47,64 @@ function ProductListScreen({ navigation }: Props) {
   const [selectedCountry, setSelectedCountry] = useState<CountryFilter>('All');
   // Add state for selected sort option
   const [selectedSort, setSelectedSort] = useState<SortOption>('default');
-  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
 
+  // State for fetched products, loading, and errors
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // Raw data from Firebase
+  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]); // Filtered/sorted data
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Effect 1: Fetch data from Firebase Realtime Database
   useEffect(() => {
-    // --- Apply search filter ---
-    let filtered = MOCK_PRODUCTS.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const productsRef = ref(db, 'products/'); // Reference to the '/products' node
+    setIsLoading(true);
+    setError(null);
 
-    // --- Apply country filter (if not 'All') ---
-    if (selectedCountry !== 'All') {
-        filtered = filtered.filter(product => product.countryOfOrigin === selectedCountry);
+    const listener = onValue(productsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Convert the object received from Firebase into an array
+        const productsArray: Product[] = Object.keys(data).map(key => ({
+          id: key, // Use the key from Firebase as the id
+          ...data[key]
+        }));
+        setAllProducts(productsArray);
+      } else {
+        console.log("No products found in Firebase.");
+        setAllProducts([]); // Set to empty array if no data
+      }
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Firebase read failed: ", error);
+      setError("Failed to fetch products. Please try again later.");
+      setIsLoading(false);
+    });
+
+    // Cleanup function to remove the listener when the component unmounts
+    return () => off(productsRef, 'value', listener);
+
+  }, []); // Empty dependency array: run only once on mount
+
+  // Effect 2: Filter and sort data whenever filters, sort, or fetched data changes
+  useEffect(() => {
+    let processedProducts = [...allProducts];
+
+    // Apply search filter
+    if (searchQuery) {
+        processedProducts = processedProducts.filter(product =>
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        );
     }
 
-    // --- Apply sorting ---
-    let sorted = [...filtered]; 
+    // Apply country filter
+    if (selectedCountry !== 'All') {
+        processedProducts = processedProducts.filter(product => product.countryOfOrigin === selectedCountry);
+    }
 
+    // Apply sorting
     // 1. Default sort (Country priority if 'All' selected, then name)
-    sorted.sort((a, b) => {
+    processedProducts.sort((a, b) => {
       if (selectedCountry === 'All') {
           const isATurkish = a.countryOfOrigin === 'Turkey';
           const isBTurkish = b.countryOfOrigin === 'Turkey';
@@ -75,21 +116,21 @@ function ProductListScreen({ navigation }: Props) {
       }
       return a.name.localeCompare(b.name); // Default sort by name
     });
-
     // 2. Apply price sort if selected
     if (selectedSort === 'price-asc') {
-        sorted.sort((a, b) => a.price - b.price); // Low to High
+        processedProducts.sort((a, b) => a.price - b.price);
     } else if (selectedSort === 'price-desc') {
-        sorted.sort((a, b) => b.price - a.price); // High to Low
+        processedProducts.sort((a, b) => b.price - a.price);
     }
 
-    setDisplayedProducts(sorted);
-  }, [searchQuery, selectedCountry, selectedSort]); // Add selectedSort to dependencies
+    setDisplayedProducts(processedProducts);
+
+  }, [allProducts, searchQuery, selectedCountry, selectedSort]); // Re-run when any of these change
+
 
   const renderProductItem = ({ item }: { item: Product }) => (
     <ProductItem
       product={item}
-      
       onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
       onAddToCart={addToCart}
     />
@@ -109,10 +150,8 @@ function ProductListScreen({ navigation }: Props) {
   const handleLogout = async () => {
     try {
       await logout();
-      // Navigation happens automatically via AuthContext listener
     } catch (error) {
       console.error("Logout failed:", error);
-      // Use showAlert for cross-platform compatibility
       showAlert('Logout Failed', 'Could not log out. Please try again.');
     }
   };
@@ -135,10 +174,29 @@ function ProductListScreen({ navigation }: Props) {
       return 'Sort: Default';
   };
 
+  // --- Render Loading or Error State ---
+  if (isLoading) {
+      return (
+          <View style={[styles.container, styles.centerContent]}>
+              <ActivityIndicator size="large" color="#0000ff" />
+              <Text>Loading Products...</Text>
+          </View>
+      );
+  }
 
+  if (error) {
+      return (
+          <View style={[styles.container, styles.centerContent]}>
+              <Text style={styles.errorText}>{error}</Text>
+              {/* Optionally add a retry button */}
+          </View>
+      );
+  }
+
+  // --- Render Main Content ---
   return (
     <View style={styles.container}>
-      {/* Header with Cart and Logout */}
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerButtons}>
            <Button title="Logout" onPress={handleLogout} color="red" />
@@ -169,7 +227,6 @@ function ProductListScreen({ navigation }: Props) {
             {filterCountries.map((country) => (
               <TouchableOpacity
                 key={country}
-                // Refactored conditional style using ternary
                 style={[
                   styles.filterButton,
                   selectedCountry === country ? styles.filterButtonSelected : null
@@ -177,7 +234,6 @@ function ProductListScreen({ navigation }: Props) {
                 onPress={() => setSelectedCountry(country)}
               >
                 <Text
-                  // Refactored conditional style using ternary
                   style={[
                     styles.filterButtonText,
                     selectedCountry === country ? styles.filterButtonTextSelected : null
@@ -194,23 +250,33 @@ function ProductListScreen({ navigation }: Props) {
           </Pressable>
       </View>
 
-
       {/* Product List */}
       <FlatList
-        data={displayedProducts}
+        data={displayedProducts} // Use the filtered/sorted state
         renderItem={renderProductItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContentContainer}
-        ListEmptyComponent={<Text style={styles.emptyListText}>No products found.</Text>}
+        ListEmptyComponent={<Text style={styles.emptyListText}>No products match your criteria.</Text>} 
       />
       <StatusBar style="auto" />
     </View>
   );
 }
 
-
+// ---  Styles ---
 const styles = StyleSheet.create({
     
+    centerContent: { // Added style for centering loading/error
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: { // Added style for error message
+        color: 'red',
+        fontSize: 16,
+        textAlign: 'center',
+        padding: 20,
+    },
     container: { flex: 1, backgroundColor: '#f8f8f8' },
     header: {
       paddingVertical: 10, paddingHorizontal: 15, backgroundColor: '#fff',
