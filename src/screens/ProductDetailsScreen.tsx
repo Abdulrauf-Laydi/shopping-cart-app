@@ -57,6 +57,11 @@ function ProductDetailsScreen({ route, navigation }: ProductDetailsScreenProps) 
   const [newComment, setNewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
+  // --- Calculate Average Rating ---
+  const averageRating = reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+      : 0;
+
   // Effect to fetch single product data from Firebase
   useEffect(() => {
     const productRef = ref(db, `products/${productId}`); // Reference to the specific product node
@@ -213,7 +218,14 @@ function ProductDetailsScreen({ route, navigation }: ProductDetailsScreenProps) 
 
       {/* --- Review Section --- */}
       <View style={styles.reviewsSection}>
-          <Text style={styles.reviewsTitle}>Reviews</Text>
+          <View style={styles.reviewsHeaderContainer}>
+              <Text style={styles.reviewsTitle}>Reviews</Text>
+              {reviews.length > 0 && (
+                  <Text style={styles.averageRatingText}>
+                      Average: {averageRating.toFixed(1)} ★
+                  </Text>
+              )}
+          </View>
 
           {/* --- Add Review Form --- */}
           {user && ( // Only show form if logged in
@@ -321,10 +333,21 @@ const styles = StyleSheet.create({
       borderTopColor: '#eee',
       marginTop: 20,
   },
+  reviewsHeaderContainer: { // Style for the header container
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 15,
+  },
   reviewsTitle: {
       fontSize: 20,
       fontWeight: 'bold',
-      marginBottom: 15,
+      // Removed marginBottom as it's handled by the container
+  },
+  averageRatingText: { // Style for the average rating text
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#666',
   },
   addReviewContainer: {
       marginBottom: 20,
